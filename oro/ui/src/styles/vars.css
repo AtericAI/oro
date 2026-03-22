@@ -1,0 +1,63 @@
+:root {
+  --bg:          #171818;
+  --surface-1:   #111212;
+  --surface-2:   #121313;
+  --surface-3:   #141515;
+  --surface-4:   #171818;
+  --border:      #2a2b2d;
+  --border-soft: #232426;
+  --border-hi:   #3a3b3e;
+  --text:        #d7d7d7;
+  --text-hi:     #efefef;
+  --muted:       #a2a2a2;
+  --muted-2:     #8a8a8a;
+  --green:       #00c853;
+
+  /* Legacy aliases for hooks/utils that reference old names */
+  --panel:         var(--surface-4);
+  --panel-2:       var(--surface-3);
+  --text-muted:    var(--muted);
+  --text-dim:      var(--muted-2);
+  --accent:        var(--green);
+  --accent-dim:    rgba(0, 200, 83, 0.12);
+  --status-running: #fbbf24;
+  --status-success: var(--green);
+  --status-failed:  #ff5252;
+  --status-idle:    var(--muted-2);
+
+  /* Spacing scale (base 4px) */
+  --sp-1:  4px;
+  --sp-2:  8px;
+  --sp-3:  12px;
+  --sp-4:  16px;
+  --sp-5:  20px;
+  --sp-6:  24px;
+  --sp-8:  32px;
+  --sp-12: 48px;
+
+  /* Type scale (Major Second ×1.125 @ 14px) */
+  --text-xs:   12px;
+  --text-sm:   13px;
+  --text-base: 14px;
+  --text-doc:  16px;
+  --text-h3:   18px;
+  --text-h2:   20px;
+  --text-h1:   24px;
+
+  /* Fonts */
+  --font-sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Helvetica, Arial, sans-serif;
+  --font-mono: "Berkeley Mono", "Cascadia Code", "Fira Code", "Consolas", monospace;
+  --font-serif: "DM Serif Display", Georgia, serif;
+
+  /* Animation */
+  --ease-fast:   150ms ease;
+  --ease-mid:    200ms ease;
+  --ease-spring: 200ms cubic-bezier(.34,1.56,.64,1);
+
+  /* Layout */
+  --radius: 6px;
+  --sidebar-width: 250px;
+  --wiki-width: 320px;
+  --topbar-height: 56px;
+}

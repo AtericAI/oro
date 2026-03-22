@@ -1,0 +1,229 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "opencode-go/kimi-k2.5",
+
+  "agent": {
+    "wiki-scanner": {
+      "description": "Reads a single source file and writes a structured wiki entry documenting its purpose, exports, dependencies, and quality issues. One file per call. Stateless.",
+      "mode": "subagent",
+      "model": "opencode-go/minimax-m2.7",
+      "temperature": 0.1,
+      "steps": 8,
+      "prompt": "{file:./prompts/scan_file.md}",
+      "permission": {
+        "read": "allow",
+        "edit": "allow",
+        "bash": {
+          "*": "deny"
+        },
+        "webfetch": "deny",
+        "task": {
+          "*": "deny"
+        }
+      },
+      "tools": {
+        "bash": false,
+        "webfetch": false,
+        "websearch": false,
+        "todowrite": false,
+        "todoread": false
+      }
+    },
+
+    "wiki-index-builder": {
+      "description": "Reads all wiki/files/*.md entries and builds oro/wiki/README.md and oro/wiki/index.json as navigation and machine-readable index.",
+      "mode": "subagent",
+      "model": "opencode-go/minimax-m2.7",
+      "temperature": 0.1,
+      "steps": 12,
+      "prompt": "{file:./prompts/update_wiki_index.md}",
+      "permission": {
+        "read": "allow",
+        "edit": "allow",
+        "bash": {
+          "*": "deny",
+          "date": "allow",
+          "wc -l *": "allow",
+          "find oro/wiki/files -name '*.md'": "allow"
+        },
+        "webfetch": "deny"
+      },
+      "tools": {
+        "bash": true,
+        "webfetch": false,
+        "websearch": false,
+        "todowrite": false,
+        "todoread": false
+      }
+    },
+
+    "analyst": {
+      "description": "Reads the codebase wiki (oro/wiki/) and identifies the single highest-impact code quality problem. Writes a bottleneck analysis and a detailed multi-task fix plan. Never reads raw source files. Never writes code.",
+      "mode": "primary",
+      "model": "opencode-go/glm-5",
+      "temperature": 0.2,
+      "steps": 30,
+      "prompt": "{file:./prompts/analyze.md}",
+      "permission": {
+        "read": {
+          "*": "deny",
+          "oro/wiki/**": "allow",
+          "oro/logs/**": "allow"
+        },
+        "edit": {
+          "*": "deny",
+          "oro/logs/**": "allow"
+        },
+        "bash": {
+          "*": "deny",
+          "find oro/wiki -name '*.md'": "allow",
+          "wc -l oro/wiki/files/*.md": "allow",
+          "cat oro/wiki/index.json": "allow"
+        },
+        "webfetch": "deny",
+        "websearch": "deny",
+        "task": {
+          "*": "deny"
+        }
+      },
+      "tools": {
+        "bash": true,
+        "webfetch": false,
+        "websearch": false,
+        "todowrite": false
+      }
+    },
+
+    "orchestrator": {
+      "description": "Reads the fix plan from oro/logs/[DATE]/02-plan.md and decomposes it into 1-5 executor task files with precise, mechanical step-by-step instructions for MiniMax M2.7 executors. Acts as a prompt engineer — output is instruction documents, not code.",
+      "mode": "primary",
+      "model": "opencode-go/kimi-k2.5",
+      "temperature": 0.15,
+      "steps": 25,
+      "prompt": "{file:./prompts/orchestrate.md}",
+      "permission": {
+        "read": {
+          "*": "deny",
+          "oro/logs/**": "allow",
+          "oro/wiki/**": "allow"
+        },
+        "edit": {
+          "*": "deny",
+          "oro/logs/**": "allow"
+        },
+        "bash": {
+          "*": "deny",
+          "cat *": "allow",
+          "find oro/logs -name '*.md'": "allow"
+        },
+        "webfetch": "deny",
+        "websearch": "deny",
+        "task": {
+          "*": "deny"
+        }
+      },
+      "tools": {
+        "bash": true,
+        "webfetch": false,
+        "websearch": false,
+        "todowrite": false
+      }
+    },
+
+    "executor": {
+      "description": "Executes a single bounded task from a task file (oro/logs/[DATE]/executor_N_task.md). Reads specified files, makes exactly the changes described, runs tests, commits if passing. No creative problem-solving. Follows instructions mechanically.",
+      "mode": "subagent",
+      "model": "opencode-go/minimax-m2.7",
+      "temperature": 0.05,
+      "steps": 20,
+      "prompt": "{file:./prompts/execute.md}",
+      "permission": {
+        "read": "allow",
+        "edit": "allow",
+        "bash": {
+          "*": "ask",
+          "git add *": "allow",
+          "git commit *": "allow",
+          "git checkout -- .": "allow",
+          "git diff *": "allow",
+          "git status": "allow",
+          "npm test": "allow",
+          "npm run test": "allow",
+          "npm run lint": "allow",
+          "npx tsc --noEmit": "allow",
+          "pytest *": "allow",
+          "go test *": "allow",
+          "cargo test *": "allow",
+          "make test": "allow",
+          "cat *": "allow",
+          "find * -name *": "allow"
+        },
+        "webfetch": "deny",
+        "websearch": "deny",
+        "task": {
+          "*": "deny"
+        }
+      },
+      "tools": {
+        "bash": true,
+        "webfetch": false,
+        "websearch": false,
+        "todowrite": false
+      }
+    },
+
+    "pr-pusher": {
+      "description": "Creates a git branch, pushes changes, and opens a GitHub pull request summarizing the code quality improvements made in this oro run.",
+      "mode": "subagent",
+      "model": "opencode-go/minimax-m2.7",
+      "temperature": 0.1,
+      "steps": 10,
+      "prompt": "{file:./prompts/push_pr.md}",
+      "permission": {
+        "read": {
+          "oro/logs/**": "allow",
+          "oro/config.json": "allow"
+        },
+        "edit": {
+          "oro/logs/**": "allow"
+        },
+        "bash": {
+          "*": "deny",
+          "git checkout -b *": "allow",
+          "git push *": "allow",
+          "git log --oneline *": "allow",
+          "gh pr create *": "allow",
+          "cat *": "allow"
+        },
+        "webfetch": "deny",
+        "websearch": "deny"
+      },
+      "tools": {
+        "bash": true,
+        "webfetch": false,
+        "websearch": false
+      }
+    }
+  },
+
+  "permission": {
+    "*": "deny",
+    "read": {
+      "oro/**": "allow",
+      "*.json": "allow",
+      "*.md": "allow"
+    },
+    "edit": {
+      "oro/**": "allow"
+    },
+    "bash": {
+      "*": "deny"
+    },
+    "webfetch": "deny",
+    "websearch": "deny",
+    "external_directory": {
+      "*": "ask"
+    },
+    "doom_loop": "ask"
+  }
+}

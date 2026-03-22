@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mockup — UX</title>
+  <style>
+    /* ─────────────────────────────────────────────────────
+       DESIGN TOKENS
+       Base unit: 4px
+       Spacing scale: 4|8|12|16|20|24|32|48
+       Type scale: Major Second ×1.125 @ 14px
+         12 metadata | 13 secondary | 14 body
+         16 doc-body | 18 h3 | 20 h2 | 24 h1
+    ───────────────────────────────────────────────────── */
+    :root {
+      --bg:          #171818;
+      --surface-1:   #111212;
+      --surface-2:   #121313;
+      --surface-3:   #141515;
+      --surface-4:   #171818;
+      --border:      #2a2b2d;
+      --border-soft: #232426;
+      --border-hi:   #3a3b3e;
+      --text:        #d7d7d7;
+      --text-hi:     #efefef;
+      --muted:       #a2a2a2;
+      --muted-2:     #8a8a8a;
+      --green:       #00c853;
+
+      --sp-1:  4px;
+      --sp-2:  8px;
+      --sp-3:  12px;
+      --sp-4:  16px;
+      --sp-5:  20px;
+      --sp-6:  24px;
+      --sp-8:  32px;
+      --sp-12: 48px;
+
+      --text-xs:   12px;
+      --text-sm:   13px;
+      --text-base: 14px;
+      --text-doc:  16px;
+      --text-h3:   18px;
+      --text-h2:   20px;
+      --text-h1:   24px;
+
+      /* Animation */
+      --ease-fast:   150ms ease;
+      --ease-mid:    200ms ease;
+      --ease-spring: 200ms cubic-bezier(.34,1.56,.64,1);
+    }
+
+    /* ─── Reset ─────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      height: 100dvh;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Helvetica, Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
+      overflow: hidden;
+    }
+
+    /* ─── Custom scrollbar ──────────────────────────────── */
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 2px;
+    }
+    ::-webkit-scrollbar-thumb:hover { background: var(--border-hi); }
+    * { scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+
+    /* ─── App shell ───────────────────────────────────────── */
+    .app {
+      width: 100%;
+      max-width: 1600px;
+      height: 100%;
+      border-left: 1px solid var(--border);
+      border-right: 1px solid var(--border);
+      background: #131414;
+      display: grid;
+      /* Industry standard flexible 3-column split */
+      grid-template-columns: 250px 2fr 1fr;
+      grid-template-rows: 100%;
+      overflow: hidden;
+    }
+
+    /* ─── Sidebar ───────────────────────────────────────── */
+    .sidebar {
+      background: var(--surface-4);
+      border-right: 1px solid var(--border-soft);
+      padding: var(--sp-5) var(--sp-4);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+    }
+
+    .sidebar-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--sp-8);
+    }
+
+    .logo {
+      height: 24px;
+      width: auto;
+    }
+
+    .pane-icon {
+      width: 24px;
+      height: 24px;
+      opacity: .55;
+      cursor: pointer;
+      transition: opacity var(--ease-fast);
+    }
+    .pane-icon:hover { opacity: .9; }
+
+    .log-list {
+      margin-top: var(--sp-2);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      color: var(--muted);
+      padding-bottom: var(--sp-8);
+    }
+
+    .chat-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 10px;
+      margin: 0 -10px;
+      border-radius: 6px;
+      font-size: var(--text-base);
+      cursor: pointer;
+      transition: background-color var(--ease-fast), color var(--ease-fast);
+      position: relative;
+    }
+
+    .chat-item:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-hi);
+    }
+
+    .chat-actions {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .chat-dropdown-icon {
+      width: 16px;
+      height: 16px;
+      opacity: 0;
+      transition: opacity var(--ease-fast);
+    }
+
+    .chat-item:hover .chat-dropdown-icon { opacity: 0.6; }
+    .chat-dropdown-icon:hover { opacity: 1; }
+
+    .chat-dropdown-menu {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      margin-top: 4px;
+      background: var(--surface-1);
+      border: 1px solid var(--border-soft);
+      border-radius: 6px;
+      padding: 4px;
+      display: none;
+      flex-direction: column;
+      min-width: 120px;
+      z-index: 100;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      cursor: default;
+    }
+
+    .chat-actions:hover .chat-dropdown-menu { display: flex; }
+
+    .menu-item {
+      padding: 6px 10px;
+      border-radius: 4px;
+      color: var(--text);
+      font-size: var(--text-sm);
+      cursor: pointer;
+      transition: background-color var(--ease-fast), color var(--ease-fast);
+    }
+    .menu-item:hover {
+      background: rgba(255,255,255,0.06);
+      color: var(--text-hi);
+    }
+    .menu-item.danger { color: #ff5252; }
+    .menu-item.danger:hover {
+      background: rgba(255, 82, 82, 0.1);
+      color: #ff5252;
+    }
+
+    .chat-item.all {
+      margin-top: var(--sp-2);
+      color: #bcbcbc;
+      font-size: var(--text-sm);
+      justify-content: flex-start;
+    }
+    .chat-item.all:hover { 
+      color: #fff; 
+      background: rgba(255,255,255,0.05);
+    }
+
+    /* ─── Center column ─────────────────────────────────── */
+    .center {
+      background: var(--surface-2);
+      border-right: 1px solid var(--border);
+      padding: var(--sp-6) var(--sp-5);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+    }
+
+    .stack {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-4);
+    }
+
+    /* Action card */
+    .action-card {
+      border: 1px solid var(--border-soft);
+      background: var(--surface-3);
+      border-radius: 14px;
+      overflow: hidden;
+      transition: border-color var(--ease-fast);
+    }
+    .action-card:has(.action-row:hover) { border-color: var(--border-hi); }
+
+    .action-row {
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 var(--sp-4);
+      color: var(--muted);
+      border-top: 1px solid rgba(255,255,255,.04);
+      cursor: pointer;
+      transition: background-color var(--ease-fast), color var(--ease-fast);
+    }
+    .action-row:first-child { border-top: none; }
+    .action-row:hover {
+      background: rgba(255,255,255,.03);
+      color: var(--text);
+    }
+
+    .action-row .left {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-2);
+      font-size: var(--text-base);
+    }
+
+    .icon {
+      width: 16px;
+      height: 16px;
+      display: inline-block;
+      opacity: .8;
+      flex: 0 0 auto;
+      transition: opacity var(--ease-fast);
+    }
+    .action-row:hover .icon { opacity: 1; }
+
+    .chev {
+      width: 16px;
+      height: 16px;
+      opacity: .45;
+      flex: 0 0 auto;
+      transition: transform var(--ease-spring), opacity var(--ease-fast);
+    }
+    .action-row:hover .chev {
+      transform: translateX(3px);
+      opacity: .7;
+    }
+
+    /* Swarm */
+    .swarm {
+      border: 1px solid var(--border-soft);
+      background: var(--surface-3);
+      border-radius: 14px;
+      padding: var(--sp-3);
+      transition: border-color var(--ease-fast);
+    }
+
+    .swarm-title {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-2);
+      color: var(--muted);
+      font-size: var(--text-base);
+      margin-bottom: var(--sp-3);
+    }
+
+    .subagent {
+      background: #222020;
+      border: 1px solid transparent;
+      border-radius: 10px;
+      padding: 10px var(--sp-3);
+      margin-bottom: var(--sp-2);
+      color: #b8b8b8;
+      cursor: pointer;
+      transition: background-color var(--ease-fast), border-color var(--ease-fast), color var(--ease-fast);
+    }
+    .subagent:last-child { margin-bottom: 0; }
+    .subagent:hover {
+      background: #292626;
+      border-color: var(--border-soft);
+      color: #d0d0d0;
+    }
+    .subagent .name {
+      font-size: var(--text-base);
+      margin-bottom: var(--sp-1);
+    }
+    .subagent .prompt {
+      color: #979797;
+      font-size: var(--text-sm);
+      display: flex;
+      align-items: center;
+      gap: var(--sp-2);
+      padding-left: var(--sp-2);
+    }
+
+    /* Paragraph */
+    .paragraph {
+      padding: 0 var(--sp-4);
+      color: #c6c6c6;
+      line-height: 1.55;
+      font-size: var(--text-base);
+      max-width: 640px;
+    }
+
+    /* Update */
+    .update {
+      border: 1px solid var(--border-soft);
+      border-radius: 12px;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 var(--sp-4);
+      color: var(--muted);
+      font-size: var(--text-base);
+      cursor: pointer;
+      transition: background-color var(--ease-fast), border-color var(--ease-fast), color var(--ease-fast);
+    }
+    .update:hover {
+      background: rgba(255,255,255,.025);
+      border-color: var(--border-hi);
+      color: var(--text);
+    }
+    .update .chev { transition: transform var(--ease-spring), opacity var(--ease-fast); }
+    .update:hover .chev {
+      transform: translateX(3px);
+      opacity: .7;
+    }
+
+    /* Status */
+    .status {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-3);
+      color: #9f9f9f;
+      font-size: var(--text-base);
+      padding: var(--sp-3) var(--sp-4);
+    }
+    .status svg { flex: 0 0 auto; }
+
+    @keyframes draw-check {
+      from { stroke-dashoffset: 40; opacity: 0; }
+      to   { stroke-dashoffset: 0;  opacity: 1; }
+    }
+    @keyframes pop-circle {
+      0%   { transform: scale(.8); opacity: 0; }
+      60%  { transform: scale(1.08); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .status-circle {
+      transform-origin: 12px 12px;
+      animation: pop-circle 400ms cubic-bezier(.34,1.56,.64,1) both;
+      animation-delay: 200ms;
+    }
+    .status-check {
+      stroke-dasharray: 40;
+      stroke-dashoffset: 40;
+      animation: draw-check 350ms ease-out forwards;
+      animation-delay: 450ms;
+    }
+
+    /* ─── Right column ─────────────────────────────────── */
+    .right {
+      background: var(--surface-1);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow: hidden;
+      min-width: 0;
+    }
+
+    .topbar {
+      height: 56px;
+      flex: 0 0 56px;
+      border-bottom: 1px solid var(--border-soft);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 var(--sp-5);
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-4);
+      font-size: var(--text-base);
+      color: #cfcfcf;
+    }
+
+    .topbar-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      cursor: pointer;
+      opacity: .55;
+      transition: opacity var(--ease-fast), background-color var(--ease-fast);
+    }
+    .topbar-btn:hover {
+      opacity: 1;
+      background: rgba(255,255,255,.06);
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-1);
+    }
+
+    .doc {
+      flex: 1;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      padding: var(--sp-6);
+      line-height: 1.6;
+      color: #d0d0d0;
+      font-size: var(--text-doc);
+      white-space: pre-wrap;
+    }
+
+    .doc .h1, .doc .h2, .doc .h3 {
+      color: #e1e1e1;
+      margin: 0 0 var(--sp-3) 0;
+    }
+    .doc .h1 { font-size: var(--text-h1); }
+    .doc .h2 { font-size: var(--text-h2); }
+    .doc .h3 { font-size: var(--text-h3); }
+
+    /* ════════════════════════════════════════════════════
+       INDUSTRY STANDARD RESPONSIVE GRID
+       ════════════════════════════════════════════════════ */
+
+    /* ── Tablet: <= 1024px
+       Collapses into an elegant 2-column layout. 
+       Sidebar remains on the left. Center and Right share vertical space.
+    ───────────────────────────────────────────────────── */
+    @media (max-width: 1024px) {
+      .app {
+        grid-template-columns: 250px 1fr;
+        grid-template-rows: 1fr 1fr;
+      }
+      .sidebar {
+        grid-column: 1;
+        grid-row: 1 / 3;
+      }
+      .center {
+        grid-column: 2;
+        grid-row: 1;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+      .right {
+        grid-column: 2;
+        grid-row: 2;
+      }
+    }
+
+    /* ── Mobile: <= 768px
+       Reverts into a fluid, naturally scrolling vertical stack. 
+    ───────────────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      body {
+        overflow: auto;
+        display: block;
+      }
+      
+      .app {
+        display: flex;
+        flex-direction: column;
+        height: auto;
+        border-left: none;
+        border-right: none;
+      }
+
+      .sidebar, .center, .right {
+        width: 100%;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+        overflow: visible;
+      }
+
+      .sidebar {
+        /* Prevents massive log lists from burying main content */
+        max-height: 280px; 
+        overflow-y: auto;
+      }
+
+      .right {
+        border-bottom: none;
+        display: block; /* Disables internal flex constraint */
+      }
+      
+      .doc {
+        overflow: visible;
+      }
+      
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: var(--surface-1);
+      }
+
+      /* Enhances visibility of dropdown triggers on touch */
+      .chat-dropdown-icon {
+        opacity: 0.6;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+
+    <!-- ── Sidebar ────────────────────────────────────── -->
+    <aside class="sidebar">
+      <div class="sidebar-top">
+        <img src="logo.svg" alt="Logo" class="logo" />
+        <svg class="pane-icon" viewBox="0 0 24 24" fill="none" stroke="#9a9a9a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3.5" y="4" width="17" height="16" rx="2.5"></rect>
+          <line x1="10" y1="4.5" x2="10" y2="19.5"></line>
+        </svg>
+      </div>
+
+      <div class="log-list">
+        <div class="chat-item">
+          <span class="chat-title">2026-09-18</span>
+          <div class="chat-actions">
+            <svg class="chat-dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/>
+            </svg>
+            <div class="chat-dropdown-menu">
+              <div class="menu-item">Share</div>
+              <div class="menu-item">Rename</div>
+              <div class="menu-item danger">Delete</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="chat-item">
+          <span class="chat-title">2026-09-17</span>
+          <div class="chat-actions">
+            <svg class="chat-dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/>
+            </svg>
+            <div class="chat-dropdown-menu">
+              <div class="menu-item">Share</div>
+              <div class="menu-item">Rename</div>
+              <div class="menu-item danger">Delete</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="chat-item">
+          <span class="chat-title">2026-09-16</span>
+          <div class="chat-actions">
+            <svg class="chat-dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/>
+            </svg>
+            <div class="chat-dropdown-menu">
+              <div class="menu-item">Share</div>
+              <div class="menu-item">Rename</div>
+              <div class="menu-item danger">Delete</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="chat-item">
+          <span class="chat-title">2026-09-15</span>
+          <div class="chat-actions">
+            <svg class="chat-dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/>
+            </svg>
+            <div class="chat-dropdown-menu">
+              <div class="menu-item">Share</div>
+              <div class="menu-item">Rename</div>
+              <div class="menu-item danger">Delete</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="chat-item">
+          <span class="chat-title">2026-09-14</span>
+          <div class="chat-actions">
+            <svg class="chat-dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/>
+            </svg>
+            <div class="chat-dropdown-menu">
+              <div class="menu-item">Share</div>
+              <div class="menu-item">Rename</div>
+              <div class="menu-item danger">Delete</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="chat-item">
+          <span class="chat-title">2026-09-13</span>
+          <div class="chat-actions">
+            <svg class="chat-dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/>
+            </svg>
+            <div class="chat-dropdown-menu">
+              <div class="menu-item">Share</div>
+              <div class="menu-item">Rename</div>
+              <div class="menu-item danger">Delete</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="chat-item">
+          <span class="chat-title">2026-09-12</span>
+          <div class="chat-actions">
+            <svg class="chat-dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/>
+            </svg>
+            <div class="chat-dropdown-menu">
+              <div class="menu-item">Share</div>
+              <div class="menu-item">Rename</div>
+              <div class="menu-item danger">Delete</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="chat-item">
+          <span class="chat-title">2026-09-11</span>
+          <div class="chat-actions">
+            <svg class="chat-dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/>
+            </svg>
+            <div class="chat-dropdown-menu">
+              <div class="menu-item">Share</div>
+              <div class="menu-item">Rename</div>
+              <div class="menu-item danger">Delete</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="chat-item all">
+          <span class="chat-title">All Logs</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ── Center ─────────────────────────────────────── -->
+    <main class="center">
+      <div class="stack">
+
+        <div class="action-card">
+          <div class="action-row">
+            <div class="left">
+              <svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 3h8M4 8h8M4 13h8"/>
+                <circle cx="2.5" cy="3" r="1"/><circle cx="2.5" cy="8" r="1"/><circle cx="2.5" cy="13" r="1"/>
+              </svg>
+              <span>Read Wiki</span>
+            </div>
+            <svg class="chev" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 3l5 5-5 5"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="action-card">
+          <div class="action-row">
+            <div class="left">
+              <svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 3h8M4 8h8M4 13h8"/>
+                <circle cx="2.5" cy="3" r="1"/><circle cx="2.5" cy="8" r="1"/><circle cx="2.5" cy="13" r="1"/>
+              </svg>
+              <span>Write Plan</span>
+            </div>
+            <svg class="chev" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 3l5 5-5 5"/>
+            </svg>
+          </div>
+          <div class="action-row">
+            <div class="left">
+              <svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2.2" y="1.8" width="11.6" height="12.4" rx="2"/>
+                <circle cx="8" cy="5.2" r="1.8"/>
+                <path d="M4.8 12.1c.8-1.9 2-3 3.2-3s2.4 1.1 3.2 3"/>
+              </svg>
+              <span>Create Subagent</span>
+            </div>
+            <svg class="chev" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 3l5 5-5 5"/>
+            </svg>
+          </div>
+          <div class="action-row">
+            <div class="left">
+              <svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2.2" y="1.8" width="11.6" height="12.4" rx="2"/>
+                <circle cx="8" cy="5.2" r="1.8"/>
+                <path d="M4.8 12.1c.8-1.9 2-3 3.2-3s2.4 1.1 3.2 3"/>
+              </svg>
+              <span>Create Subagent</span>
+            </div>
+            <svg class="chev" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 3l5 5-5 5"/>
+            </svg>
+          </div>
+          <div class="action-row">
+            <div class="left">
+              <svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2.2" y="1.8" width="11.6" height="12.4" rx="2"/>
+                <circle cx="8" cy="5.2" r="1.8"/>
+                <path d="M4.8 12.1c.8-1.9 2-3 3.2-3s2.4 1.1 3.2 3"/>
+              </svg>
+              <span>Create Subagent</span>
+            </div>
+            <svg class="chev" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 3l5 5-5 5"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="swarm">
+          <div class="swarm-title">
+            <svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="5" cy="5" r="2"/>
+              <circle cx="11.5" cy="4" r="1.7"/>
+              <circle cx="10.8" cy="10.8" r="1.9"/>
+              <path d="M6.7 6.2l2.8-1.1M6 6.8l3.5 2.7M11.2 5.7l-.2 3.2"/>
+            </svg>
+            <span>Agent Swarm</span>
+          </div>
+          <div class="subagent">
+            <div class="name">Subagent</div>
+            <div class="prompt">└ <span>Placeholder prompt</span></div>
+          </div>
+          <div class="subagent">
+            <div class="name">Subagent</div>
+            <div class="prompt">└ <span>Placeholder prompt</span></div>
+          </div>
+          <div class="subagent">
+            <div class="name">Subagent</div>
+            <div class="prompt">└ <span>Placeholder prompt</span></div>
+          </div>
+        </div>
+
+        <div class="paragraph">
+          The analysis identified a critical code quality bottleneck stemming from duplicated logic and
+          inefficient data processing patterns across multiple modules, which increased maintenance
+          overhead and degraded performance. The agents refactored the affected components by
+          consolidating redundant functions into a single reusable abstraction, optimizing algorithmic
+          complexity, and introducing clearer separation of concerns. As a result, execution time decreased
+          measurably, code readability improved, and the overall system became easier to extend and test.
+        </div>
+
+        <div class="update">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 3h8M4 8h8M4 13h8"/>
+              <circle cx="2.5" cy="3" r="1"/><circle cx="2.5" cy="8" r="1"/><circle cx="2.5" cy="13" r="1"/>
+            </svg>
+            <span>Update Wiki</span>
+          </div>
+          <svg class="chev" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 3l5 5-5 5"/>
+          </svg>
+        </div>
+
+        <div class="status">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle class="status-circle" cx="12" cy="12" r="10" stroke="var(--green)"/>
+            <path class="status-check" d="M8 12.3l2.5 2.5L16.5 8.8" stroke="var(--green)"/>
+          </svg>
+          <span>PR pushed</span>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- ── Right ──────────────────────────────────────── -->
+    <section class="right">
+      <div class="topbar">
+        <div class="topbar-left">
+          <div class="topbar-btn" title="Back">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a9a9a9" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M15 18l-6-6 6-6"/>
+            </svg>
+          </div>
+          <span>PLAN.md</span>
+        </div>
+        <div class="topbar-right">
+          <div class="topbar-btn" title="Download">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a9a9a9" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3v12M7 10l5 5 5-5M5 20h14"/>
+            </svg>
+          </div>
+          <div class="topbar-btn" title="Close">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a9a9a9" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 6L6 18M6 6l12 12"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="doc"># PLAN
+
+## Overview
+This document outlines the high-level plan for the coding agent. It serves as a placeholder and will
+evolve as the system design becomes clearer.
+
+## Objectives
+- Define the agent's purpose and scope
+- Establish core capabilities
+- Outline development phases
+- Identify risks and constraints
+
+## Core Capabilities (Planned)
+- Task interpretation (natural language → structured actions)
+- Code generation and editing
+- File system interaction
+- Execution and feedback loop
+- Error detection and recovery
+
+## Architecture (Draft)
+- Input Layer: Receives user instructions
+- Parsing Layer: Converts instructions into structured tasks
+- Planning Module: Breaks tasks into steps
+- Execution Engine: Performs code operations
+- Feedback Loop: Validates and refines outputs
+
+## Development Phases
+1. **Phase 1 – Prototype**
+   - Basic prompt → code generation
+   - Simple file write/read support
+
+2. **Phase 2 – Structured Planning**
+   - Introduce task decomposition
+   - Add intermediate reasoning steps
+
+3. **Phase 3 – Multi-Agent**
+   - Subagent spawning and coordination
+   - Shared context and memory
+
+4. **Phase 4 – Production**
+   - Reliability hardening
+   - Observability and logging
+   - Rate limiting and cost controls
+
+## Risks & Constraints
+- Context window limits for long-running sessions
+- Non-determinism in generated code
+- Tool call latency under load
+- Coordination overhead in swarm mode
+      </div>
+    </section>
+
+  </div>
+</body>
+</html>

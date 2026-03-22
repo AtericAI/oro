@@ -1,0 +1,34 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Environment
+.env
+.env.oro
+.env.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# oro generated files
+oro/logs/
+oro/wiki/files/
+oro/wiki/index.json
+oro/server/static/
+
+# Keep these tracked:
+# oro/wiki/README.md
+# oro/prompts/
+# oro/scripts/
+# oro/opencode.json
+# oro/AGENTS.md
+# oro/config.json (tracked but with secrets in env vars)

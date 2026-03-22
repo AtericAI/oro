@@ -7,7 +7,7 @@
       "mode": "primary",
       "model": "opencode-go/minimax-m2.7",
       "temperature": 0.1,
-      "steps": 8,
+      "steps": 60,
       "prompt": "{file:prompts/scan_file.md}",
       "permission": {
         "read": "allow",
@@ -33,7 +33,7 @@
       "mode": "primary",
       "model": "opencode-go/minimax-m2.7",
       "temperature": 0.1,
-      "steps": 12,
+      "steps": 100,
       "prompt": "{file:prompts/update_wiki_index.md}",
       "permission": {
         "read": "allow",
@@ -42,7 +42,7 @@
           "*": "deny",
           "date": "allow",
           "wc -l *": "allow",
-          "find oro/wiki/files -name '*.md'": "allow"
+          "find *"": "allow"
         },
         "webfetch": "deny"
       },
@@ -59,7 +59,7 @@
       "mode": "primary",
       "model": "opencode-go/glm-5",
       "temperature": 0.2,
-      "steps": 30,
+      "steps": 60,
       "prompt": "{file:prompts/analyze.md}",
       "permission": {
         "read": {
@@ -95,7 +95,7 @@
       "mode": "primary",
       "model": "opencode-go/kimi-k2.5",
       "temperature": 0.15,
-      "steps": 25,
+      "steps": 60,
       "prompt": "{file:prompts/orchestrate.md}",
       "permission": {
         "read": {
@@ -130,7 +130,7 @@
       "mode": "primary",
       "model": "opencode-go/minimax-m2.7",
       "temperature": 0.05,
-      "steps": 20,
+      "steps": 50,
       "prompt": "{file:prompts/execute.md}",
       "permission": {
         "read": "allow",

@@ -203,11 +203,11 @@ init_project() {
   fi
 
   if command -v oro &>/dev/null; then
-    oro init
+    oro init < /dev/tty
   elif [[ -x "$ORO_INSTALL_DIR/bin/oro" ]]; then
-    "$ORO_INSTALL_DIR/bin/oro" init
+    "$ORO_INSTALL_DIR/bin/oro" init < /dev/tty
   elif [[ -f "$ORO_INSTALL_DIR/dist/cli/index.js" ]]; then
-    node "$ORO_INSTALL_DIR/dist/cli/index.js" init
+    node "$ORO_INSTALL_DIR/dist/cli/index.js" init < /dev/tty
   else
     step_warn "Could not run oro init — run it manually after restarting your shell"
   fi
@@ -241,6 +241,5 @@ echo "  Quick start:"
 echo "    oro run          # Run a full quality cycle"
 echo "    oro scan         # Scan codebase into wiki"
 echo "    oro status       # Check run status"
-echo "    oro ui           # Open dashboard at http://localhost:7070"
 echo "    oro --help       # All commands"
 echo ""

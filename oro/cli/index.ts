@@ -61,4 +61,4 @@ program.command('init')
   .description('Initialize oro in current directory')
   .action(initCmd)
 
-program.parse()
+program.parseAsync()

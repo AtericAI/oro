@@ -38,12 +38,7 @@
       "permission": {
         "read": "allow",
         "edit": "allow",
-        "bash": {
-          "*": "deny",
-          "date": "allow",
-          "wc -l *": "allow",
-          "find *"": "allow"
-        },
+        "bash": "allow",
         "webfetch": "deny"
       },
       "tools": {

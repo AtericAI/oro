@@ -29,7 +29,7 @@ Files are the message bus. Git is the undo mechanism. Every `opencode run` call 
 ## Install
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/orohq/oro/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/AtericAI/oro/main/install.sh | bash
 ```
 
 ### Prerequisites
@@ -42,7 +42,7 @@ curl -fsSL https://raw.githubusercontent.com/orohq/oro/main/install.sh | bash
 ### Manual Install
 
 ```bash
-git clone https://github.com/orohq/oro ~/.oro
+git clone https://github.com/AtericAI/oro ~/.oro
 cd ~/.oro && npm install && npm run build
 export PATH="$HOME/.oro/bin:$PATH"
 ```

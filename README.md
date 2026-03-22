@@ -1,4 +1,4 @@
-# ○ oro
+# oro
 
 **Open-source code quality engineer AI agent.**
 

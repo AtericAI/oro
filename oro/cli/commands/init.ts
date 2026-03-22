@@ -4,22 +4,34 @@ import readline from 'readline'
 import { getProjectRoot, getOroDir, getPackageRoot, getEnvPath } from '../utils/paths.js'
 import { info, success, warn, error, logo } from '../utils/output.js'
 
+let _rl: readline.Interface | null = null;
+function getRL(): readline.Interface {
+  if (!_rl) _rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  return _rl;
+}
+
 function prompt(question: string): Promise<string> {
-  const rl = readline.createInterface({ input: process.stdin, output: process.stdout })
+  const rl = getRL();
   return new Promise(resolve => {
-    rl.question(question, answer => {
-      rl.close()
-      resolve(answer.trim())
-    })
-  })
+    rl.question(question, (answer: string) => {
+      resolve(answer.trim());
+    });
+  });
 }
 
 function promptYN(question: string, defaultYes = true): Promise<boolean> {
-  const suffix = defaultYes ? '[Y/n]' : '[y/N]'
+  const suffix = defaultYes ? '[Y/n]' : '[y/N]';
   return prompt(`${question} ${suffix}: `).then(ans => {
-    if (!ans) return defaultYes
-    return ans.toLowerCase().startsWith('y')
-  })
+    if (!ans) return defaultYes;
+    return ans.toLowerCase().startsWith('y');
+  });
+}
+
+function closeRL(): void {
+  if (_rl) {
+    _rl.close();
+    _rl = null;
+  }
 }
 
 function ensureDir(dir: string): void {
@@ -61,6 +73,7 @@ export async function initCmd(): Promise<void> {
     const overwrite = await promptYN('oro/ directory already exists. Reinitialize?', false)
     if (!overwrite) {
       info('Aborted.')
+      closeRL()
       return
     }
   }
@@ -286,4 +299,5 @@ export async function initCmd(): Promise<void> {
   console.log('    oro status       # Check run status')
   console.log('    oro ui           # Open dashboard')
   console.log('')
+  closeRL()
 }

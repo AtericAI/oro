@@ -1,15 +1,14 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "model": "opencode-go/kimi-k2.5",
-
   "agent": {
     "wiki-scanner": {
       "description": "Reads a single source file and writes a structured wiki entry documenting its purpose, exports, dependencies, and quality issues. One file per call. Stateless.",
-      "mode": "subagent",
+      "mode": "primary",
       "model": "opencode-go/minimax-m2.7",
       "temperature": 0.1,
       "steps": 8,
-      "prompt": "{file:./prompts/scan_file.md}",
+      "prompt": "{file:prompts/scan_file.md}",
       "permission": {
         "read": "allow",
         "edit": "allow",
@@ -29,14 +28,13 @@
         "todoread": false
       }
     },
-
     "wiki-index-builder": {
       "description": "Reads all wiki/files/*.md entries and builds oro/wiki/README.md and oro/wiki/index.json as navigation and machine-readable index.",
-      "mode": "subagent",
+      "mode": "primary",
       "model": "opencode-go/minimax-m2.7",
       "temperature": 0.1,
       "steps": 12,
-      "prompt": "{file:./prompts/update_wiki_index.md}",
+      "prompt": "{file:prompts/update_wiki_index.md}",
       "permission": {
         "read": "allow",
         "edit": "allow",
@@ -56,14 +54,13 @@
         "todoread": false
       }
     },
-
     "analyst": {
       "description": "Reads the codebase wiki (oro/wiki/) and identifies the single highest-impact code quality problem. Writes a bottleneck analysis and a detailed multi-task fix plan. Never reads raw source files. Never writes code.",
       "mode": "primary",
       "model": "opencode-go/glm-5",
       "temperature": 0.2,
       "steps": 30,
-      "prompt": "{file:./prompts/analyze.md}",
+      "prompt": "{file:prompts/analyze.md}",
       "permission": {
         "read": {
           "*": "deny",
@@ -93,14 +90,13 @@
         "todowrite": false
       }
     },
-
     "orchestrator": {
       "description": "Reads the fix plan from oro/logs/[DATE]/02-plan.md and decomposes it into 1-5 executor task files with precise, mechanical step-by-step instructions for MiniMax M2.7 executors. Acts as a prompt engineer — output is instruction documents, not code.",
       "mode": "primary",
       "model": "opencode-go/kimi-k2.5",
       "temperature": 0.15,
       "steps": 25,
-      "prompt": "{file:./prompts/orchestrate.md}",
+      "prompt": "{file:prompts/orchestrate.md}",
       "permission": {
         "read": {
           "*": "deny",
@@ -129,14 +125,13 @@
         "todowrite": false
       }
     },
-
     "executor": {
       "description": "Executes a single bounded task from a task file (oro/logs/[DATE]/executor_N_task.md). Reads specified files, makes exactly the changes described, runs tests, commits if passing. No creative problem-solving. Follows instructions mechanically.",
-      "mode": "subagent",
+      "mode": "primary",
       "model": "opencode-go/minimax-m2.7",
       "temperature": 0.05,
       "steps": 20,
-      "prompt": "{file:./prompts/execute.md}",
+      "prompt": "{file:prompts/execute.md}",
       "permission": {
         "read": "allow",
         "edit": "allow",
@@ -168,17 +163,17 @@
         "bash": true,
         "webfetch": false,
         "websearch": false,
-        "todowrite": false
+        "todowrite": false,
+        "todoread": false
       }
     },
-
     "pr-pusher": {
       "description": "Creates a git branch, pushes changes, and opens a GitHub pull request summarizing the code quality improvements made in this oro run.",
-      "mode": "subagent",
+      "mode": "primary",
       "model": "opencode-go/minimax-m2.7",
       "temperature": 0.1,
       "steps": 10,
-      "prompt": "{file:./prompts/push_pr.md}",
+      "prompt": "{file:prompts/push_pr.md}",
       "permission": {
         "read": {
           "oro/logs/**": "allow",
@@ -205,7 +200,6 @@
       }
     }
   },
-
   "permission": {
     "*": "deny",
     "read": {

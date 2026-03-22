@@ -2,6 +2,8 @@
 set -euo pipefail
 
 DATE=$(date +%Y-%m-%d)
+export XDG_DATA_HOME="/tmp/oro-opencode-data"
+mkdir -p "$XDG_DATA_HOME"
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 ORO_DIR="$PROJECT_ROOT/oro"
 LOG_FILE="$ORO_DIR/logs/$DATE/05-wiki-update.md"
@@ -34,7 +36,7 @@ while IFS= read -r file; do
   
   echo "Re-scanning: $file" | tee -a "$LOG_FILE"
   
-  opencode run \
+  opencode run </dev/null \
     --model "opencode-go/minimax-m2.7" \
     --agent "wiki-scanner" \
     "@oro/prompts/scan_file.md Read and document this file: $file" \
@@ -43,7 +45,7 @@ while IFS= read -r file; do
 done <<< "$CHANGED_FILES"
 
 # Rebuild index
-opencode run \
+opencode run </dev/null \
   --model "opencode-go/minimax-m2.7" \
   --agent "wiki-index-builder" \
   "@oro/prompts/update_wiki_index.md Rebuild the wiki README and index." 2>&1 | tee -a "$LOG_FILE"

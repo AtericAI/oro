@@ -2,6 +2,8 @@
 set -euo pipefail
 
 DATE=$(date +%Y-%m-%d)
+export XDG_DATA_HOME="/tmp/oro-opencode-data"
+mkdir -p "$XDG_DATA_HOME"
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 ORO_DIR="$PROJECT_ROOT/oro"
 MAX_EXECUTORS=5
@@ -41,7 +43,7 @@ for TASK_FILE in "${TASK_FILES[@]}"; do
       LOOP=$((LOOP + 1))
       echo "Executor $N loop $LOOP/$MAX_LOOPS"
       
-      opencode run \
+      opencode run </dev/null \
         --model "opencode-go/minimax-m2.7" \
         --agent "executor" \
         "@oro/prompts/execute.md Execute the task in this file. Write your completion report to $REPORT_FILE. Task file: $TASK_FILE" \

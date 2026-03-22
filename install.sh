@@ -2,7 +2,7 @@
 set -e
 
 # ── Constants ─────────────────────────────────────────────────────────────────
-ORO_REPO="https://github.com/orohq/oro"
+ORO_REPO="https://github.com/AtericAI/oro"
 ORO_INSTALL_DIR="$HOME/.oro"
 ORO_VERSION="${ORO_VERSION:-latest}"
 NODE_MIN_VERSION="18"

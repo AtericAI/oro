@@ -5,6 +5,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../../" && pwd)"
 ORO_DIR="$PROJECT_ROOT/oro"
 DATE=$(date +%Y-%m-%d)
+export XDG_DATA_HOME="/tmp/oro-opencode-data"
+mkdir -p "$XDG_DATA_HOME"
 LOG_DIR="$ORO_DIR/logs/$DATE"
 STATE_FILE="$LOG_DIR/.state"
 

@@ -2,6 +2,8 @@
 set -euo pipefail
 
 DATE=$(date +%Y-%m-%d)
+export XDG_DATA_HOME="/tmp/oro-opencode-data"
+mkdir -p "$XDG_DATA_HOME"
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 ORO_DIR="$PROJECT_ROOT/oro"
 
@@ -9,7 +11,7 @@ cd "$PROJECT_ROOT"
 
 echo "Running Kimi K2.5 orchestration..."
 
-opencode run \
+opencode run </dev/null \
   --model "opencode-go/kimi-k2.5" \
   --agent "orchestrator" \
   "@oro/prompts/orchestrate.md Today's date is $DATE. Read oro/logs/$DATE/02-plan.md and write executor task files for each task." 2>&1
